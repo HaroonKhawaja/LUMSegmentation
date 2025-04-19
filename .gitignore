@@ -1,0 +1,12 @@
+annotations.json
+instance_segmentation_data.ndjson
+weights/
+__pycache__
+Data/Data.zip
+Data/camera_gifs/
+Data/cleaned_camera_gifs/
+Data/lums_cam2_images/
+Data/lums_cam2_masks/
+Data/lums_instance_segmentation_data/
+Data/lums_plant_database/
+Data/plant_database/
