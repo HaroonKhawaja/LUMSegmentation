@@ -10,3 +10,4 @@ Data/lums_cam2_masks/
 Data/lums_instance_segmentation_data/
 Data/lums_plant_database/
 Data/plant_database/
+config.yaml
