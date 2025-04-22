@@ -92,19 +92,13 @@ def maskrcnn_dice_coef(groundtruth_mask, pred_mask):
     dice = np.mean(2 * intersect/total_sum)
     return dice
 
-def evaluate_maskrcnn_model(model, data_loader, device, score_threshold=0.5):
+def evaluate_maskrcnn_model(model, data_loader, device, score_threshold=0.5, soft_leaf_acc_threshold=0):
     model = model.eval()
     model = model.to(device)
     
     resize = 256
-    correct = 0
-    count = 0
-
-    iou_list = []
-    precision_list = []
-    recall_list = []
-    accuracy_list = []
-    dice_list = []
+    count, total_batches = 0, 0
+    iou_list, precision_list, recall_list, accuracy_list, dice_list = [], [], [], [], []
     
     with torch.no_grad():
         for images, targets in data_loader:
@@ -121,9 +115,9 @@ def evaluate_maskrcnn_model(model, data_loader, device, score_threshold=0.5):
                 pred_leaves_count = pred_boxes.shape[0]
                 true_leaves_count = true_boxes.shape[0]
 
-                if true_leaves_count == pred_leaves_count:
-                    correct += 1
-                # count += 1
+                total_batches += 1
+                if abs(pred_leaves_count - true_leaves_count) <= soft_leaf_acc_threshold:
+                    count += 1
 
                 combined_mask_true = np.zeros((resize, resize), dtype=np.uint8)
                 combined_mask_pred = np.zeros((resize, resize), dtype=np.uint8)
@@ -147,8 +141,9 @@ def evaluate_maskrcnn_model(model, data_loader, device, score_threshold=0.5):
     m_recall = torch.mean(torch.tensor(recall_list))
     m_acc = torch.mean(torch.tensor(accuracy_list))
     m_dice = torch.mean(torch.tensor(dice_list))
-    leaf_count_accuracy = (correct / count) * 100
-    print(f'Leaf Count Accuracy: {leaf_count_accuracy:.3f}%')
+
+    leaf_count_accuracy = (count / total_batches) * 100
+    print(f'Soft Leaf Count Accuracy (+/- {soft_leaf_acc_threshold}): {leaf_count_accuracy:.3f}%')
     print(f'Precison: {m_precision:.3f}')
     print(f'Recall: {m_recall:.3f}')
     print(f'Accuracy: {m_acc:.3f}')

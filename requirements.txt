@@ -1,0 +1,11 @@
+numpy
+imageio
+torch
+torchvision
+torchsummary
+matplotlib  
+Pillow     
+tqdm
+opencv-python
+scikit-image
+torchinfo
